@@ -1,0 +1,19 @@
+{
+  "models": [
+    {
+      "name": "mlp",
+      "type": "MLP",
+      "path": "mlp/model.json",
+      "labels": "labels.json"
+    },
+    {
+      "name": "lstm",
+      "type": "LSTM",
+      "path": "lstm/model.json",
+      "labels": "lstm_labels.json",
+      "sequence_length": 30
+    }
+  ],
+  "version": "1.0.0",
+  "description": "ASL Alphabet Classifier Models"
+}

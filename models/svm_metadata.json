@@ -1,0 +1,39 @@
+{
+  "best_params": {
+    "C": 10,
+    "gamma": "scale",
+    "kernel": "rbf"
+  },
+  "classes": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+    "del",
+    "space"
+  ],
+  "n_features": 63,
+  "n_classes": 28
+}

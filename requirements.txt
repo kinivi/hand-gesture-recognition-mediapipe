@@ -1,0 +1,13 @@
+# ASL Translator - Model Training Dependencies
+tensorflow>=2.13.0
+scikit-learn>=1.3.0
+mediapipe>=0.10.0
+opencv-python>=4.8.0
+pandas>=2.0.0
+numpy>=1.24.0
+tensorflowjs>=4.0.0
+tqdm>=4.65.0
+joblib>=1.3.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+

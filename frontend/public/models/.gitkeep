@@ -1,0 +1,14 @@
+# Place your TensorFlow.js models here
+# Copy the contents of ../models/tfjs/ to this directory
+#
+# Structure should be:
+# public/models/
+# ├── mlp/
+# │   ├── model.json
+# │   └── group1-shard1of1.bin
+# ├── lstm/
+# │   ├── model.json
+# │   └── group1-shard1of1.bin
+# ├── labels.json
+# └── lstm_labels.json
+
