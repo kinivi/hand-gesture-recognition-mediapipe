@@ -1,0 +1,80 @@
+<svg viewBox="0 0 280 598" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, -apple-system, sans-serif">
+
+  <!-- background -->
+  <rect width="280" height="598" fill="#f9fafb" rx="14"/>
+
+  <!-- title -->
+  <text x="140" y="22" text-anchor="middle" font-size="10" fill="#9ca3af">System Pipeline</text>
+
+  <!-- ── Node 1: Webcam ── -->
+  <rect x="20" y="30" width="240" height="50" rx="10" fill="#dbeafe"/>
+  <text x="140" y="51" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a8a">📷  Webcam</text>
+  <text x="140" y="68" text-anchor="middle" font-size="10" fill="#3b82f6">30 fps video feed</text>
+
+  <!-- arrow -->
+  <line x1="140" y1="80" x2="140" y2="92" stroke="#d1d5db" stroke-width="1.5"/>
+  <polygon points="134,90 146,90 140,98" fill="#d1d5db"/>
+
+  <!-- ── Node 2: OpenCV ── -->
+  <rect x="20" y="98" width="240" height="50" rx="10" fill="#ede9fe"/>
+  <text x="140" y="119" text-anchor="middle" font-size="13" font-weight="700" fill="#4c1d95">OpenCV</text>
+  <text x="140" y="136" text-anchor="middle" font-size="10" fill="#7c3aed">capture · convert · flip</text>
+
+  <!-- arrow -->
+  <line x1="140" y1="148" x2="140" y2="160" stroke="#d1d5db" stroke-width="1.5"/>
+  <polygon points="134,158 146,158 140,166" fill="#d1d5db"/>
+
+  <!-- ── Node 3: MediaPipe ── -->
+  <rect x="20" y="166" width="240" height="50" rx="10" fill="#ede9fe"/>
+  <text x="140" y="187" text-anchor="middle" font-size="13" font-weight="700" fill="#4c1d95">MediaPipe Tasks</text>
+  <text x="140" y="204" text-anchor="middle" font-size="10" fill="#7c3aed">21 hand keypoints</text>
+
+  <!-- arrow -->
+  <line x1="140" y1="216" x2="140" y2="228" stroke="#d1d5db" stroke-width="1.5"/>
+  <polygon points="134,226 146,226 140,234" fill="#d1d5db"/>
+
+  <!-- ── Node 4: Normalization ── -->
+  <rect x="20" y="234" width="240" height="50" rx="10" fill="#ede9fe"/>
+  <text x="140" y="255" text-anchor="middle" font-size="13" font-weight="700" fill="#4c1d95">Landmark Normalization</text>
+  <text x="140" y="272" text-anchor="middle" font-size="10" fill="#7c3aed">position &amp; scale invariant</text>
+
+  <!-- arrow -->
+  <line x1="140" y1="284" x2="140" y2="296" stroke="#d1d5db" stroke-width="1.5"/>
+  <polygon points="134,294 146,294 140,302" fill="#d1d5db"/>
+
+  <!-- ── Node 5: TFLite MLP ── -->
+  <rect x="20" y="302" width="240" height="50" rx="10" fill="#ede9fe"/>
+  <text x="140" y="323" text-anchor="middle" font-size="13" font-weight="700" fill="#4c1d95">TFLite MLP</text>
+  <text x="140" y="340" text-anchor="middle" font-size="10" fill="#7c3aed">gesture classifier</text>
+
+  <!-- arrow -->
+  <line x1="140" y1="352" x2="140" y2="364" stroke="#d1d5db" stroke-width="1.5"/>
+  <polygon points="134,362 146,362 140,370" fill="#d1d5db"/>
+
+  <!-- ── Node 6: GestureBuffer ── -->
+  <rect x="20" y="370" width="240" height="50" rx="10" fill="#ede9fe"/>
+  <text x="140" y="391" text-anchor="middle" font-size="13" font-weight="700" fill="#4c1d95">GestureBuffer</text>
+  <text x="140" y="408" text-anchor="middle" font-size="10" fill="#7c3aed">noise filter · majority vote</text>
+
+  <!-- arrow -->
+  <line x1="140" y1="420" x2="140" y2="432" stroke="#d1d5db" stroke-width="1.5"/>
+  <polygon points="134,430 146,430 140,438" fill="#d1d5db"/>
+
+  <!-- ── Node 7: Chrome Dino ── -->
+  <rect x="20" y="438" width="240" height="50" rx="10" fill="#fce7f3"/>
+  <text x="140" y="459" text-anchor="middle" font-size="13" font-weight="700" fill="#831843">Chrome Dino Loop</text>
+  <text x="140" y="476" text-anchor="middle" font-size="10" fill="#db2777">monkey-patched game</text>
+
+  <!-- arrow -->
+  <line x1="140" y1="488" x2="140" y2="500" stroke="#d1d5db" stroke-width="1.5"/>
+  <polygon points="134,498 146,498 140,506" fill="#d1d5db"/>
+
+  <!-- ── Node 8: Output ── -->
+  <rect x="20" y="506" width="240" height="50" rx="10" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+  <text x="140" y="527" text-anchor="middle" font-size="13" font-weight="700" fill="#064e3b">🦕  Jump / Duck / Run</text>
+  <text x="140" y="544" text-anchor="middle" font-size="10" fill="#059669">physical game action</text>
+
+  <!-- footer hint -->
+  <text x="140" y="584" text-anchor="middle" font-size="9" fill="#9ca3af">↗ Click to explore each stage interactively</text>
+
+</svg>

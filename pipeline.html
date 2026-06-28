@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GestureEdge — System Pipeline</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    min-height: 100vh;
+    padding: 40px 32px;
+  }
+
+  header { margin-bottom: 28px; }
+  h1 { font-size: 18px; font-weight: 700; color: #f0f6fc; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #8b949e; }
+
+  /* ── two-column layout ── */
+  .layout {
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+    max-width: 840px;
+  }
+
+  /* left: pipeline */
+  .pipeline-col {
+    flex: 0 0 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .node {
+    width: 220px;
+    padding: 11px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.12s;
+    text-align: center;
+    user-select: none;
+    border: 2px solid transparent;
+  }
+  .node:hover { transform: translateX(3px); }
+  .node.active { border-color: #fff; }
+
+  .node-label { font-size: 13px; font-weight: 700; }
+  .node-sub   { font-size: 11px; margin-top: 3px; opacity: 0.7; }
+
+  .arrow {
+    width: 2px;
+    height: 20px;
+    background: #30363d;
+    position: relative;
+    margin: 0 auto;
+  }
+  .arrow::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid #30363d;
+  }
+
+  .n-cam  { background: #1c3a6e; color: #93c5fd; }
+  .n-cv   { background: #1e2a6e; color: #a5b4fc; }
+  .n-mp   { background: #2d1b69; color: #c4b5fd; }
+  .n-norm { background: #2d1b69; color: #c4b5fd; }
+  .n-mlp  { background: #2d1b69; color: #c4b5fd; }
+  .n-buf  { background: #2d1b69; color: #c4b5fd; }
+  .n-game { background: #4a1040; color: #f9a8d4; }
+  .n-out  { background: #064e3b; color: #6ee7b7; }
+
+  /* right: detail panel — sticky */
+  .detail-col {
+    flex: 1;
+    position: sticky;
+    top: 40px;
+  }
+
+  .detail-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 220px;
+    border: 1px dashed #30363d;
+    border-radius: 12px;
+    color: #484f58;
+    font-size: 13px;
+    gap: 8px;
+  }
+  .detail-placeholder span { font-size: 28px; }
+
+  .detail-panel {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 20px 22px;
+    display: none;
+  }
+  .detail-panel.visible { display: block; }
+
+  .detail-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+
+  .detail-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+  .detail-body {
+    font-size: 13px;
+    color: #8b949e;
+    line-height: 1.75;
+  }
+  .detail-body code {
+    background: #21262d;
+    color: #e6edf3;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+  .detail-body strong { color: #e6edf3; }
+
+  a.back {
+    display: inline-block;
+    margin-top: 36px;
+    font-size: 12px;
+    color: #58a6ff;
+    text-decoration: none;
+  }
+  a.back:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>GestureEdge — System Pipeline</h1>
+  <p class="subtitle">Click any box to understand what it does and why</p>
+</header>
+
+<div class="layout">
+
+  <!-- LEFT: pipeline -->
+  <div class="pipeline-col">
+
+    <div class="node n-cam" data-id="cam" data-tag="Input" data-color="#1c3a6e" data-text="#93c5fd">
+      <div class="node-label">📷 Webcam</div>
+      <div class="node-sub">30 fps video feed</div>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="node n-cv" data-id="cv" data-tag="Preprocessing" data-color="#1e2a6e" data-text="#a5b4fc">
+      <div class="node-label">OpenCV</div>
+      <div class="node-sub">capture · convert · flip</div>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="node n-mp" data-id="mp" data-tag="Detection" data-color="#2d1b69" data-text="#c4b5fd">
+      <div class="node-label">MediaPipe Tasks</div>
+      <div class="node-sub">21 hand keypoints</div>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="node n-norm" data-id="norm" data-tag="Feature Engineering" data-color="#2d1b69" data-text="#c4b5fd">
+      <div class="node-label">Landmark Normalization</div>
+      <div class="node-sub">position &amp; scale invariant</div>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="node n-mlp" data-id="mlp" data-tag="Inference" data-color="#2d1b69" data-text="#c4b5fd">
+      <div class="node-label">TFLite MLP</div>
+      <div class="node-sub">gesture classifier</div>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="node n-buf" data-id="buf" data-tag="Signal Processing" data-color="#2d1b69" data-text="#c4b5fd">
+      <div class="node-label">GestureBuffer</div>
+      <div class="node-sub">noise filter · majority vote</div>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="node n-game" data-id="game" data-tag="Integration" data-color="#4a1040" data-text="#f9a8d4">
+      <div class="node-label">Chrome Dino Loop</div>
+      <div class="node-sub">monkey-patched game</div>
+    </div>
+    <div class="arrow"></div>
+
+    <div class="node n-out" data-id="out" data-tag="Output" data-color="#064e3b" data-text="#6ee7b7">
+      <div class="node-label">🦕 Jump / Duck / Run</div>
+      <div class="node-sub">physical game action</div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: detail -->
+  <div class="detail-col">
+
+    <div class="detail-placeholder" id="placeholder">
+      <span>👆</span>
+      Click any box on the left
+    </div>
+
+    <div class="detail-panel" id="panel">
+      <div class="detail-tag" id="panel-tag"></div>
+      <div class="detail-title" id="panel-title"></div>
+      <div class="detail-body"  id="panel-body"></div>
+    </div>
+
+  </div>
+</div>
+
+<a class="back" href="README.md">← Back to README</a>
+
+<script>
+const details = {
+  cam: {
+    tag: "Input",
+    title: "Webcam — the entry point",
+    body: `A standard USB webcam captures video at 30 fps. Each frame is a <strong>numpy array</strong> of shape <code>(height, width, 3)</code> — three color channels per pixel.`
+  },
+  cv: {
+    tag: "Preprocessing",
+    title: "OpenCV — format correction before MediaPipe",
+    body: `Two steps happen here before anything else:<br><br>
+<strong>BGR → RGB:</strong> OpenCV stores pixels as Blue-Green-Red by default. MediaPipe expects Red-Green-Blue. Swapping channels is required — otherwise skin detection breaks.<br><br>
+<strong>Flip:</strong> the raw feed is mirrored. Flipping makes the camera behave like a mirror, so your right hand appears on the right side of the screen — intuitive for the user.`
+  },
+  mp: {
+    tag: "Detection",
+    title: "MediaPipe Tasks — finding where your hand is",
+    body: `MediaPipe detects the hand and returns <strong>21 keypoints</strong>: fingertips, knuckles, palm, and wrist. Each point has an <code>(x, y)</code> coordinate in screen space.<br><br>
+21 points × 2 coordinates = <strong>42 raw values</strong>. These are not fed to the classifier yet — they need normalization first.`
+  },
+  norm: {
+    tag: "Feature Engineering",
+    title: "Landmark Normalization — making the input consistent",
+    body: `Problem: raw pixel coordinates change every time you move your hand or step closer to the camera. The classifier would see a different input for the same gesture.<br><br>
+<strong>Fix in two steps:</strong><br>
+① Subtract the wrist position (landmark 0) from all 21 points → removes <em>where</em> the hand is<br>
+② Divide by the largest absolute value → removes <em>how big</em> the hand appears<br><br>
+Result: the same <strong>42-dim vector</strong> for the same gesture, regardless of position or distance.`
+  },
+  mlp: {
+    tag: "Inference",
+    title: "TFLite MLP — classifying the gesture",
+    body: `A tiny neural network: <strong>42 inputs → 20 neurons → 10 neurons → 4 outputs</strong>. Total: only 1,114 parameters.<br><br>
+The 4 output classes: Open hand (Jump), Fist (Duck), Pointer (Run), OK (trained but unused). Accuracy: <strong>97.2%</strong>.<br><br>
+<strong>Why not TensorRT GPU?</strong> Benchmarked both: TensorRT took <code>0.062 ms</code>, ONNX CPU took <code>0.038 ms</code>. The model is too small — GPU memory transfer overhead costs more than the actual math. ONNX on CPU wins.`
+  },
+  buf: {
+    tag: "Signal Processing",
+    title: "GestureBuffer — smoothing noisy predictions",
+    body: `Problem: one frame where a finger is partly hidden can flip the class from "Open" to "Fist" — the dino jumps randomly.<br><br>
+<strong>Solution:</strong> keep a sliding window of the last <code>10</code> frame results. The output is the <strong>majority vote</strong> — the class that appears most often wins.<br><br>
+Also: if the hand disappears for ≤ <code>5</code> frames (e.g. glove briefly loses detection), hold the last stable gesture. This prevents the dino from stopping mid-jump due to brief tracking dropout.`
+  },
+  game: {
+    tag: "Integration",
+    title: "Chrome Dino Loop — injecting input without touching the source",
+    body: `The game runs its own loop. Instead of modifying the original game code, I used <strong>monkey-patching</strong>: replacing the game's internal <code>_loop</code> method at runtime with a custom version.<br><br>
+Each frame, the patched loop reads the current stable gesture and injects <code>'Up'</code> (jump) or <code>'Down'</code> (duck) into the game's key set. The original game logic runs unchanged — it just sees keyboard input.`
+  },
+  out: {
+    tag: "Output",
+    title: "Physical game action",
+    body: `The dino responds to gesture-injected keys:<br><br>
+🖐 Open hand → <code>Up</code> key → dino jumps over cacti<br><br>
+✊ Fist → <code>Down</code> key → dino ducks under pterodactyls<br><br>
+☝️ Pointer → no key injected → dino runs normally`
+  }
+};
+
+const nodes        = document.querySelectorAll('.node');
+const placeholder  = document.getElementById('placeholder');
+const panel        = document.getElementById('panel');
+const panelTag     = document.getElementById('panel-tag');
+const panelTitle   = document.getElementById('panel-title');
+const panelBody    = document.getElementById('panel-body');
+let active = null;
+
+nodes.forEach(node => {
+  node.addEventListener('click', () => {
+    const id = node.dataset.id;
+
+    if (active === node) {
+      node.classList.remove('active');
+      panel.classList.remove('visible');
+      placeholder.style.display = 'flex';
+      active = null;
+      return;
+    }
+
+    if (active) active.classList.remove('active');
+    node.classList.add('active');
+    active = node;
+
+    const d = details[id];
+    const bg   = node.dataset.color;
+    const text = node.dataset.text;
+
+    panelTag.textContent = d.tag;
+    panelTag.style.background = bg;
+    panelTag.style.color = text;
+    panelTitle.textContent = d.title;
+    panelBody.innerHTML    = d.body;
+
+    placeholder.style.display = 'none';
+    panel.classList.add('visible');
+  });
+});
+</script>
+</body>
+</html>

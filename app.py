@@ -57,14 +57,15 @@ def main():
     cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
 
-    # Model load #############################################################
-    mp_hands = mp.solutions.hands
-    hands = mp_hands.Hands(
-        static_image_mode=use_static_image_mode,
-        max_num_hands=1,
-        min_detection_confidence=min_detection_confidence,
-        min_tracking_confidence=min_tracking_confidence,
+    # Model load — MediaPipe Tasks API (0.10.x) ###############################
+    base_options = mp.tasks.BaseOptions(model_asset_path='hand_landmarker.task')
+    options = mp.tasks.vision.HandLandmarkerOptions(
+        base_options=base_options,
+        num_hands=1,
+        min_hand_detection_confidence=0.7,
+        min_tracking_confidence=0.5,
     )
+    landmarker = mp.tasks.vision.HandLandmarker.create_from_options(options)
 
     keypoint_classifier = KeyPointClassifier()
 
@@ -115,16 +116,14 @@ def main():
         debug_image = copy.deepcopy(image)
 
         # Detection implementation #############################################################
-        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-
-        image.flags.writeable = False
-        results = hands.process(image)
-        image.flags.writeable = True
+        rgb_image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
+        result = landmarker.detect(mp_image)
 
         #  ####################################################################
-        if results.multi_hand_landmarks is not None:
-            for hand_landmarks, handedness in zip(results.multi_hand_landmarks,
-                                                  results.multi_handedness):
+        if result.hand_landmarks:
+            for i, hand_landmarks in enumerate(result.hand_landmarks):
+                handedness_label = result.handedness[i][0].category_name if result.handedness else "Unknown"
                 # Bounding box calculation
                 brect = calc_bounding_rect(debug_image, hand_landmarks)
                 # Landmark calculation
@@ -164,7 +163,7 @@ def main():
                 debug_image = draw_info_text(
                     debug_image,
                     brect,
-                    handedness,
+                    handedness_label,
                     keypoint_classifier_labels[hand_sign_id],
                     point_history_classifier_labels[most_common_fg_id[0][0]],
                 )
@@ -199,7 +198,7 @@ def calc_bounding_rect(image, landmarks):
 
     landmark_array = np.empty((0, 2), int)
 
-    for _, landmark in enumerate(landmarks.landmark):
+    for _, landmark in enumerate(landmarks):
         landmark_x = min(int(landmark.x * image_width), image_width - 1)
         landmark_y = min(int(landmark.y * image_height), image_height - 1)
 
@@ -218,7 +217,7 @@ def calc_landmark_list(image, landmarks):
     landmark_point = []
 
     # Keypoint
-    for _, landmark in enumerate(landmarks.landmark):
+    for _, landmark in enumerate(landmarks):
         landmark_x = min(int(landmark.x * image_width), image_width - 1)
         landmark_y = min(int(landmark.y * image_height), image_height - 1)
         # landmark_z = landmark.z
@@ -496,7 +495,7 @@ def draw_info_text(image, brect, handedness, hand_sign_text,
     cv.rectangle(image, (brect[0], brect[1]), (brect[2], brect[1] - 22),
                  (0, 0, 0), -1)
 
-    info_text = handedness.classification[0].label[0:]
+    info_text = handedness
     if hand_sign_text != "":
         info_text = info_text + ':' + hand_sign_text
     cv.putText(image, info_text, (brect[0] + 5, brect[1] - 4),

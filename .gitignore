@@ -133,3 +133,9 @@ dmypy.json
 .idea/
 
 .DS_Store
+
+# External game dependency — clone separately from https://github.com/dhhruv/Chrome-Dino-Runner
+Chrome-Dino-Runner-master/
+
+# Claude Code session files
+.claude/
